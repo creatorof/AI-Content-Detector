@@ -1,0 +1,46 @@
+version: "3.7"
+services:
+  api:
+    image: akraradets/brainlab-gpt2detect-api:0.1.0
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+    command: flask --app app run --host=0.0.0.0 --port=80
+    # For development purpose, we map the entire `code` folder so it is convenient for development.
+    volumes:
+      - ./logs:/root/logs
+      - ./backend-cache:/root/.cache
+      # These two is for development only
+      - ./backend:/root/backend
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.api-gpt2detect.loadbalancer.server.port=80
+    networks:
+      - default
+      - traefik_default
+  web:
+    image: akraradets/brainlab-gpt2detect-web:0.1.0
+    build:
+      context: .
+      dockerfile: web.Dockerfile
+    command: serve -s build
+    volumes:
+      - ./logs:/root/logs
+      - ./frontend-cache:/root/.cache
+      - ./frontend:/root/frontend
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.web-gpt2detect.loadbalancer.server.port=80
+      # This is for SSL
+      # - traefik.http.routers.web-aitgpt.tls=true
+      # - traefik.http.routers.web-aitgpt.entrypoints=entry-default
+    env_file:
+      - web.env
+    networks:
+      - default
+      - traefik_default
+
+networks:
+  default:
+  traefik_default:
+    external: true
