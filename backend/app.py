@@ -7,8 +7,15 @@ app = Flask(__name__)
 CORS(app)
 
 
+@app.route('/', methods=['GET'])
+def root():
+    return jsonify("hi from the api-gpt2detect"), 201
+
 @app.route('/detect', methods=['POST'])
 def detect():
+    print(f"{request=}")
+    print(f"{request.form=}")
+    print(f"{request.form['content']=}")
     type = request.form['type']
     
     if type == 'file':
