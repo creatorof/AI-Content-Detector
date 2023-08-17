@@ -3,8 +3,11 @@ from PyPDF2 import PdfReader
 
 pipe = pipeline("text-classification", model="roberta-base-openai-detector")
 
-def check_content(content):
-    output = pipe(content)
+def check_content(contents):
+    output = []
+    for sentence in contents:
+        result = pipe(sentence)
+        output.append({'result':result[0], 'sentence': sentence})
     return output
 
 

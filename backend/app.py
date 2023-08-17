@@ -9,15 +9,7 @@ CORS(app)
 
 @app.route('/detect', methods=['POST'])
 def detect():
-    type = request.form['type']
-    
-    if type == 'file':
-        file = request.files['file']
-        content = read_pdf(file)
-    elif type == 'text':
-        content = request.form['content']
-    
-    content = content[0:500]
-    output = check_content(content)
+    content = request.get_json(cache=True)
+    output = check_content(content['data'])
         
     return jsonify(output), 201
